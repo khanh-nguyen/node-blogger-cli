@@ -1,0 +1,20 @@
+{
+  "name": "node-blogger-cli",
+  "version": "1.0.0",
+  "description": "Command-line tool to help accelerate working with google Blogger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no test\""
+  },
+  "keywords": [
+    "nodejs",
+    "blogger"
+  ],
+  "author": "Khanh Nguyen",
+  "license": "MIT",
+  "dependencies": {
+    "gapi": "0.0.3",
+    "nconf": "^0.7.1",
+    "request": "^2.53.0"
+  }
+}

@@ -1,0 +1,26 @@
+#!/bin/sh
+rdlkf() { 
+    # if command is symlink
+    [ -L "$1" ] && \
+    ( \
+        # resolve the link
+        local lk="$(readlink "$1")"; \
+        # get directory name
+        local d="$(dirname "$1")"; \
+        # go to the directory
+        cd "$d"; \
+        # recursively call rdlkf on the path
+        local l="$(rdlkf "$lk")"; \
+        # if l is absolute path
+        ([[ "$l" = /* ]] && \
+        # then return l
+        echo "$l" || \
+        # otherwise, return d/l
+        echo "$d/$l") \
+    ) || \
+    # otherwise, return the command
+    echo "$1";
+}
+# run rdlkf on the script and get the directory name
+DIR="$(dirname "$(rdlkf "$0")")"
+/usr/bin/env node --harmony "$DIR/blogger-cli.js" "$@"

@@ -1,10 +1,14 @@
 {
   "name": "node-blogger-cli",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Command-line tool to help accelerate working with google Blogger",
-  "main": "index.js",
+  "main": "bin/blogger-cli",
+  "bin": {
+    "blogger-cli": "bin/blogger-cli"
+  },
   "scripts": {
-    "test": "echo \"no test\""
+    "test": "echo \"no test\"",
+      "postinstall": "chmod a+x ./bin/*"
   },
   "keywords": [
     "nodejs",
@@ -13,8 +17,13 @@
   "author": "Khanh Nguyen",
   "license": "MIT",
   "dependencies": {
-    "gapi": "0.0.3",
+    "co": "^4.4.0",
+    "commander": "git://github.com/tj/commander.js.git#master",
+    "googleapis": "^1.1.4",
+    "lodash": "^3.3.1",
     "nconf": "^0.7.1",
-    "request": "^2.53.0"
+    "nightmare": "^1.7.0",
+    "readline-sync": "^0.7.4",
+    "thunkify": "^2.1.2"
   }
 }

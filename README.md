@@ -22,7 +22,7 @@ blogger-cli post -p path/to/file
 
 The first command inserts draft, while the latter one inserts, then publishs the post.
 
-TODO:
+# TODO:
 * Implement setup steps
 * Add more functionality. Eg: list posts, update posts, delete posts, etc.
 * Publish multiple posts at once. 

@@ -35,12 +35,13 @@ let CLIENT_ID = nconf.get('BLOGGER_CLIENT_ID'),
 
     oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET),
 
-    blogger = google.blogger({version: 'v3', auth: oauth2Client});
+    blogger = google.blogger({version: 'v3', auth: oauth2Client}),
+    insertPost = thunkify(blogger.posts.insert);
 
 oauth2Client.setCredentials({access_token: accessToken});
 
 co(function*() {
-    yield _.map(files, function*(file) {
+    yield _.map(files, function*(file, done) {
         let filePath = path.resolve(file),
             postContent = yield readPost(filePath),
             opts = _.merge({resource: postContent}, {
@@ -48,7 +49,7 @@ co(function*() {
                 isDraft: isDraft
             });
 
-        blogger.posts.insert(opts, function(err) {
+        yield insertPost(opts)(function(err, res) {
             if (err) {
                 if (err.code === 401) {
                     // TODO: if there's a way to get refresh_token, we can just refresh here.
@@ -61,6 +62,5 @@ co(function*() {
         });
     });
 });
-
 
 

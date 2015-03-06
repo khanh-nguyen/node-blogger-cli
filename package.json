@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"no test\"",
-      "postinstall": "chmod a+x ./bin/*"
+    "postinstall": "chmod a+x ./bin/*"
   },
   "keywords": [
     "nodejs",

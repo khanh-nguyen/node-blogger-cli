@@ -58,7 +58,7 @@ co(function*() {
                 }
                 throw err;
             }
-            console.log(file, ': Post inserted successfully!');
+            console.log(file, ': Post inserted successfully! ID =', res.id);
         });
     });
 });

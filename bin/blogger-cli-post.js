@@ -6,8 +6,7 @@ const program = require('commander'),
     nconf = require('nconf'),
     google = require('googleapis'),
     OAuth2Client = google.auth.OAuth2,
-    thunkify = require('thunkify'),
-    readPost = thunkify(require('../lib/read-post')),
+    readPost = require('../lib/read-post'),
     co = require('co');
 
 program
@@ -35,32 +34,43 @@ let CLIENT_ID = nconf.get('BLOGGER_CLIENT_ID'),
 
     oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET),
 
-    blogger = google.blogger({version: 'v3', auth: oauth2Client}),
-    insertPost = thunkify(blogger.posts.insert);
+    blogger = google.blogger({version: 'v3', auth: oauth2Client});
 
 oauth2Client.setCredentials({access_token: accessToken});
 
-co(function*() {
-    yield _.map(files, function*(file, done) {
-        let filePath = path.resolve(file),
-            postContent = yield readPost(filePath),
-            opts = _.merge({resource: postContent}, {
-                blogId: blogId,
-                isDraft: isDraft
-            });
+insertPostSequentially(files, 0);
 
-        yield insertPost(opts)(function(err, res) {
+// NOTE: we must insert post sequentially, otherwise, we will get Backend error
+// as Google does not allow multiple inserts at the same time.
+function insertPostSequentially(files, idx) {
+    if (idx >= files.length) {
+        return;
+    }
+
+    let file = files[idx],
+        filePath = path.resolve(file);
+
+    readPost(filePath, function(err, postContent) {
+        if (err) {
+            console.log('Fail to read file', filePath);
+            return insertPostSequentially(files, idx + 1);
+        }
+        let opts = _.merge({resource: postContent}, {
+            blogId: blogId,
+            isDraft: isDraft
+        });
+        blogger.posts.insert(opts, function(err, res) {
             if (err) {
                 if (err.code === 401) {
                     // TODO: if there's a way to get refresh_token, we can just refresh here.
                     console.log('Your credential has expired. Use `blogger-cli auth` to reauthorize.');
                     process.exit(0);
                 }
-                throw err;
+                console.log('Fail to insert file', file, 'Error:', err);
+                insertPostSequentially(files, idx + 1);
             }
             console.log(file, ': Post inserted successfully! ID =', res.id);
+            insertPostSequentially(files, idx + 1);
         });
     });
-});
-
-
+}

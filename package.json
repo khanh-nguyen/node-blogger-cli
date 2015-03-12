@@ -17,6 +17,7 @@
   "author": "Khanh Nguyen",
   "license": "MIT",
   "dependencies": {
+    "async": "^0.9.0",
     "co": "^4.4.0",
     "commander": "git://github.com/tj/commander.js.git#master",
     "googleapis": "^1.1.4",

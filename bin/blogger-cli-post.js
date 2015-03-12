@@ -1,14 +1,11 @@
 'use strict';
 
 const program = require('commander'),
-    _ = require('lodash'),
-    path = require('path'),
     nconf = require('nconf'),
+    async = require('async'),
     google = require('googleapis'),
     OAuth2Client = google.auth.OAuth2,
-    thunkify = require('thunkify'),
-    readPost = thunkify(require('../lib/read-post')),
-    co = require('co');
+    insertPost = require('../lib/insert-post');
 
 program
     .option('-p, --publish', 'by default a post is draft. Use this option to publish post.')
@@ -35,32 +32,12 @@ let CLIENT_ID = nconf.get('BLOGGER_CLIENT_ID'),
 
     oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET),
 
-    blogger = google.blogger({version: 'v3', auth: oauth2Client}),
-    insertPost = thunkify(blogger.posts.insert);
+    blogger = google.blogger({version: 'v3', auth: oauth2Client});
 
 oauth2Client.setCredentials({access_token: accessToken});
 
-co(function*() {
-    yield _.map(files, function*(file, done) {
-        let filePath = path.resolve(file),
-            postContent = yield readPost(filePath),
-            opts = _.merge({resource: postContent}, {
-                blogId: blogId,
-                isDraft: isDraft
-            });
-
-        yield insertPost(opts)(function(err, res) {
-            if (err) {
-                if (err.code === 401) {
-                    // TODO: if there's a way to get refresh_token, we can just refresh here.
-                    console.log('Your credential has expired. Use `blogger-cli auth` to reauthorize.');
-                    process.exit(0);
-                }
-                throw err;
-            }
-            console.log(file, ': Post inserted successfully! ID =', res.id);
-        });
-    });
+// NOTE: we must insert posts sequentially,
+// otherwise, we'll get Backend error.
+async.eachSeries(files, function(file, done) {
+   insertPost(file, blogger, blogId, isDraft, done);
 });
-
-

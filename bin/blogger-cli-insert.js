@@ -1,10 +1,10 @@
 'use strict';
 
 const program = require('commander'),
-    nconf = require('nconf'),
+    config = require('../lib/config'),
     async = require('async'),
     google = require('googleapis'),
-    OAuth2Client = google.auth.OAuth2,
+    oauth2Client = require('../lib/config').oauth2Client,
     insertPost = require('../lib/insert-post');
 
 program
@@ -19,22 +19,8 @@ if (!files.length) {
     process.exit(1);
 }
 
-nconf.argv()
-    .env();
-
-const TOKEN_FILE = nconf.get('BLOGGER_TOKEN_FILE');
-nconf.file({file: TOKEN_FILE});
-
-let CLIENT_ID = nconf.get('BLOGGER_CLIENT_ID'),
-    CLIENT_SECRET = nconf.get('BLOGGER_CLIENT_SECRET'),
-    blogId = nconf.get('BLOG_ID'),
-    accessToken = nconf.get('BLOGGER_ACCESS_TOKEN'),
-
-    oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET),
-
+let blogId = config.get('BLOG_ID'),
     blogger = google.blogger({version: 'v3', auth: oauth2Client});
-
-oauth2Client.setCredentials({access_token: accessToken});
 
 // NOTE: we must insert posts sequentially,
 // otherwise, we'll get Backend error.

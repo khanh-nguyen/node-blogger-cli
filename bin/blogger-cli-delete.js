@@ -18,6 +18,8 @@ if (id.length !== 19 || isNaN(id)) {
     return;
 }
 
+// TODO: ask for confirmation before deleting
+
 blogger.posts.delete({blogId: blogId, postId: id}, function(err) {
    if (err) {
        console.log('Cannot delete post', id);

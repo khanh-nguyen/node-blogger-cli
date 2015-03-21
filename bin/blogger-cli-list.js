@@ -3,7 +3,8 @@
 const program = require('commander'),
     blogger = require('../lib/config').blogger,
     blogId = require('../lib/config').blogId,
-    _ = require('lodash');
+    _ = require('lodash'),
+    moment = require('moment');
 
 program
     .option('--endDate <date>', 'last date to fetch')
@@ -14,29 +15,21 @@ program
     .option('--status <status>', 'statuses to include in the results')
     .parse(process.argv);
 
-if (program.endDate) {
-    validateDate(program.endDate);
-}
-
-if (program.startDate) {
-    validateDate(program.startDate);
-}
-
 if (program.status && program.status !== 'draft' && program.status !== 'live') {
     console.log('Status can only be either `draft`, `live` or undefined but given', program.status);
     process.exit(1);
 }
 
-let maxResults = program.maxResults || 5,
+let maxResults = parseInt(program.maxResults) || 5,
     opts = {
         blogId: blogId,
         fetchBodies: false,
         fetchImages: false,
         maxResults: maxResults,
         fields: 'items(id,title,status,published)',
-        endDate: program.endDate,
+        endDate: validateDate(program.endDate),
         labels: program.labels,
-        startDate: program.startDate,
+        startDate: validateDate(program.startDate),
         status: program.status
     },
     params = _.reduce(opts, function(accum, val, key) {
@@ -56,9 +49,18 @@ blogger.posts.list(params, function(err, data) {
     // TODO: displayResult(data)
 });
 
-// TODO: verify that string is a validated date
 function validateDate(dateStr) {
-    return true;
+    if (!dateStr) {
+        return undefined;
+    }
+
+    let validDate = moment(dateStr).format('YYYY-MM-DDThh:mm:ssTZD');
+    if (validDate === 'Invalid date') {
+        console.log('Invalid date string.', dateStr);
+        process.exit(1);
+    }
+
+    return validDate;
 }
 
 // display result nicely

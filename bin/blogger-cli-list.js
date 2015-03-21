@@ -4,7 +4,8 @@ const program = require('commander'),
     blogger = require('../lib/config').blogger,
     blogId = require('../lib/config').blogId,
     _ = require('lodash'),
-    moment = require('moment');
+    moment = require('moment'),
+    Table = require('cli-table');
 
 program
     .option('--endDate <date>', 'last date to fetch')
@@ -26,7 +27,7 @@ let maxResults = parseInt(program.maxResults) || 5,
         fetchBodies: false,
         fetchImages: false,
         maxResults: maxResults,
-        fields: 'items(id,title,status,published)',
+        fields: 'items(id,title,published)',
         endDate: validateDate(program.endDate),
         labels: program.labels,
         startDate: validateDate(program.startDate),
@@ -45,8 +46,7 @@ blogger.posts.list(params, function(err, data) {
         return;
     }
 
-    console.log('Result', data);
-    // TODO: displayResult(data)
+    displayResult(data)
 });
 
 function validateDate(dateStr) {
@@ -54,7 +54,7 @@ function validateDate(dateStr) {
         return undefined;
     }
 
-    let validDate = moment(dateStr).format('YYYY-MM-DDThh:mm:ssTZD');
+    let validDate = moment(dateStr).format('YYYY-MM-DDThh:mm:ss-hh:mm');
     if (validDate === 'Invalid date') {
         console.log('Invalid date string.', dateStr);
         process.exit(1);
@@ -63,7 +63,14 @@ function validateDate(dateStr) {
     return validDate;
 }
 
-// display result nicely
 function displayResult(data) {
-
+    let table = new Table({
+            head: ["No.", "ID", "Title", "Published"],
+            colWidths: [5, 22, 100, 18]
+        }),
+        idx = 1;
+    _.each(data.items, function(item) {
+        table.push([idx++, item.id, item.title, moment(item.published).format('ddd YYYY-MM-DD')]);
+    });
+    console.log(table.toString());
 }

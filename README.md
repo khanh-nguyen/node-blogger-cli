@@ -1,5 +1,5 @@
 # node-blogger-cli
-Blogger's commandline tools in NodeJS
+NodeJS tool to work with blogger's posts from command line.
 
 # Setup
 * Enable Blogger API. 
@@ -9,20 +9,27 @@ Blogger's commandline tools in NodeJS
 * Set the path to redirect URI in BLOGGER_REDIRECT_URL
 * Reload environment. Eg: `source ~/.bash_profile`
 
+# Installation
+```
+npm install -g blogger-cli
+```
+
 # Authentication
 ```
 blogger-cli auth
 ```
 
-# Insert post
+# Insert posts
 ```
-blogger-cli post path/to/file
+blogger-cli post path/to/file1 path/to/file2 path/to/filen
+blogger-cli post path/to/dir/*.*
 blogger-cli post -p path/to/file
 ```
+The first two commands insert drafts, while the latter one inserts, then publishes the post.
 
-The first command inserts draft, while the latter one inserts, then publishs the post.
+# List posts
+```
+blogger-cli list [--startDate date --endDate date --labels comma,separated,strings --status live/draft --maxResults n]
+```
+By default, `maxResults = 5`.
 
-# TODO:
-* Implement setup steps
-* Add more functionality. Eg: list posts, update posts, delete posts, etc.
-* Publish multiple posts at once. 

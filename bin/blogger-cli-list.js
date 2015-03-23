@@ -46,7 +46,7 @@ blogger.posts.list(params, function(err, data) {
         return;
     }
 
-    displayResult(data)
+    displayResult(data);
 });
 
 function validateDate(dateStr) {

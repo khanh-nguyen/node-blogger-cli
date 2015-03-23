@@ -18,10 +18,12 @@
   "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
+    "cli-table": "^0.3.1",
     "co": "^4.4.0",
     "commander": "git://github.com/tj/commander.js.git#master",
     "googleapis": "^1.1.4",
     "lodash": "^3.3.1",
+    "moment": "^2.9.0",
     "nconf": "^0.7.1",
     "nightmare": "^1.7.0",
     "readline-sync": "^0.7.4",

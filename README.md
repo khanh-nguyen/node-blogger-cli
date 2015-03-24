@@ -35,5 +35,5 @@ By default, `maxResults = 5`.
 
 # Search posts
 ```
-blogger-cli search "search query"
+blogger-cli search -q "search query"
 ```

@@ -33,3 +33,7 @@ blogger-cli list [--startDate date --endDate date --labels comma,separated,strin
 ```
 By default, `maxResults = 5`.
 
+# Search posts
+```
+blogger-cli search "search query"
+```

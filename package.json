@@ -1,6 +1,6 @@
 {
   "name": "node-blogger-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Command-line tool to help accelerate working with google Blogger",
   "main": "bin/blogger-cli",
   "bin": {

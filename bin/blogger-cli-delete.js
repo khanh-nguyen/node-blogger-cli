@@ -2,11 +2,12 @@
 
 const program = require('commander'),
     blogger = require('../lib/config').blogger,
-    blogId = require('../lib/config').blogId;
+    blogId = require('../lib/config').blogId,
+    readline = require('readline-sync');
 
 program.parse(process.argv);
 
-let id = program.args[0];
+const id = program.args[0];
 
 if (!id) {
     console.log('post ID is required');
@@ -18,17 +19,47 @@ if (id.length !== 19 || isNaN(id)) {
     return;
 }
 
-// TODO: ask for confirmation before deleting
+// FIXME: posts.get cannot get a DRAFT post
+blogger.posts.get({
+    blogId: blogId,
+    postId: id,
+    fetchBody:false,
+    fetchImages: false,
+    fields: 'title'
+}, function(err, post) {
+    if (err) {
+        if (err.code === 404) {
+            console.log('Post with ID', id, 'does not exist.');
+            process.exit(1);
+        }
+        console.log(err);
+        process.exit(1);
+    }
 
-blogger.posts.delete({blogId: blogId, postId: id}, function(err) {
-   if (err) {
-       console.log('Cannot delete post', id);
-       console.log(err);
-       return;
-   }
+    const title = post.title;
+    while(true) {
+        const ans = readline.question('Are you sure you want to delete the post: "' + title + '" ?[y/n]');
+        if (ans === 'n') {
+            process.exit(0);
+        }
 
-   console.log('Successfully deleted post', id);
+        if (ans === 'y') {
+            return blogger.posts.delete({blogId: blogId, postId: id}, function(err) {
+                if (err) {
+                    console.log('Cannot delete post', id);
+                    console.log(err);
+                    return;
+                }
+
+                console.log('Successfully deleted post', id);
+            });
+        }
+
+        console.log('Please choose either `y` or `n`.');
+    }
 });
+
+
 
 
 
